@@ -1,0 +1,28 @@
+# 记录数据（每台机器各自生成，不要提交）
+数据/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# 发行包（走 GitHub Releases，不入库）
+组会工作台.exe
+
+# 系统
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
