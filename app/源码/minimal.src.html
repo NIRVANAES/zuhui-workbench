@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="icon.png">
+<title>组会工作台</title>
+<link rel="stylesheet" href="vendor/app.css">
+<!-- 背景应援图版（由 build_minimal.py 内联 templates/bg-figures.css） -->
+<link rel="stylesheet" href="vendor/bgfig.css">
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div id="bgfig" aria-hidden="true"><i class="l"></i><i class="r"></i><i class="c"></i></div>
+<main id="app"></main>
+
+<dialog id="dlg">
+  <div class="dhead">
+    <h2>新建组会</h2>
+    <button class="x" id="dClose" type="button" aria-label="关闭">✕</button>
+  </div>
+  <label class="field">
+    <span>组会名称</span>
+    <input id="fTitle" type="text" autocomplete="off" spellcheck="false">
+  </label>
+  <label class="field">
+    <span>标签（可选，空格或逗号分隔）</span>
+    <div class="tagrow">
+      <input id="fTags" type="text" autocomplete="off" spellcheck="false" placeholder="例如：光开关 太赫兹 相变材料">
+      <button class="tagauto" id="tgAuto" type="button" disabled>自动识别标签</button>
+    </div>
+  </label>
+  <div class="tgsug" id="tgSug" hidden>
+    <span class="tgsugtxt" id="tgSugTxt"></span>
+    <span class="tgchips" id="tgChips"></span>
+  </div>
+  <div class="slots">
+    <div class="slot" id="slotPaper" tabindex="0">
+      <div class="si">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6.5 3h7L18 7.5V20a1 1 0 0 1-1 1H6.5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
+          <path d="M13.5 3v4.5H18"/><path d="M8.5 13h7M8.5 16.5h4.5"/>
+        </svg>
+      </div>
+      <div class="sk">论文文件</div>
+      <div class="sh">拖到这里，或点击选择</div>
+    </div>
+    <div class="slot" id="slotSlides" tabindex="0">
+      <div class="si">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="12.5" rx="1.6"/>
+          <path d="M12 16.5V20M8.5 20.5h7"/><path d="M10.4 7.6v5.3l4.4-2.65z"/>
+        </svg>
+      </div>
+      <div class="sk">PPT 文件</div>
+      <div class="sh">拖到这里，或点击选择</div>
+    </div>
+  </div>
+  <div class="hint">支持 <b>PDF</b>、<b>Word</b>（.docx）、<b>PPT</b>（.pptx）。旧版 .doc / .ppt 请先另存为新格式。</div>
+  <div class="dfoot">
+    <button class="btn ghost" id="dCancel" type="button">取消</button>
+    <button class="btn" id="dSave" type="button" disabled>保存并打开</button>
+  </div>
+</dialog>
+
+<dialog id="tagDlg">
+  <div class="dhead">
+    <h2>编辑标签</h2>
+    <button class="x" id="tgClose" type="button" aria-label="关闭">✕</button>
+  </div>
+  <label class="field">
+    <span>标签（空格或逗号分隔，最多 8 个）</span>
+    <div class="tagrow">
+      <input id="tgInput" type="text" autocomplete="off" spellcheck="false" placeholder="例如：光开关 太赫兹 相变材料">
+      <button class="tagauto" id="tgAuto2" type="button">自动识别标签</button>
+    </div>
+  </label>
+  <div class="tgsug" id="tgSug2" hidden>
+    <span class="tgsugtxt" id="tgSugTxt2"></span>
+    <span class="tgchips" id="tgChips2"></span>
+  </div>
+  <div class="dfoot">
+    <button class="btn ghost" id="tgCancel" type="button">取消</button>
+    <button class="btn" id="tgSave" type="button">保存</button>
+  </div>
+</dialog>
+
+<dialog id="renameDlg">
+  <div class="dhead">
+    <h2>改组会名称</h2>
+    <button class="x" id="rnClose" type="button" aria-label="关闭">✕</button>
+  </div>
+  <label class="field">
+    <span>组会名称</span>
+    <input id="rnInput" type="text" autocomplete="off" spellcheck="false">
+  </label>
+  <div class="hint">只改名字。论文、PPT、标签、看到第几页，都不动。</div>
+  <div class="dfoot">
+    <button class="btn ghost" id="rnCancel" type="button">取消</button>
+    <button class="btn" id="rnSave" type="button">保存</button>
+  </div>
+</dialog>
+
+<dialog id="imgDlg">
+  <div class="dhead">
+    <h2>插入论文插图</h2>
+    <button class="x" id="imClose" type="button" aria-label="关闭">✕</button>
+  </div>
+  <div class="hint" id="imHint">正在准备…</div>
+  <div class="impage" id="imPageWrap">
+    <div class="imthumbs" id="imThumbs"></div>
+    <div class="imstage" id="imStage">
+      <img id="imPageImg" alt="论文页">
+      <div class="imsel" id="imSel" hidden></div>
+    </div>
+    <div class="imfoot">
+      <span class="imsz" id="imSize"></span>
+      <button class="btn ghost sm" id="imClear" type="button">清除选区</button>
+      <button class="btn sm" id="imInsert" type="button">插入选中区域</button>
+    </div>
+  </div>
+  <div class="dfoot">
+    <button class="btn ghost" id="imCancel" type="button">关闭</button>
+  </div>
+</dialog>
+
+<dialog id="bgDlg">
+  <div class="dhead">
+    <h2>背景图片</h2>
+    <button class="x" id="bgClose" type="button" aria-label="关闭">✕</button>
+  </div>
+  <div class="bglist" id="bgRows"></div>
+  <div class="hint">图片只保存在本机，不会上传。建议用<b>竖版</b>图（宽高比约 2:3），显示效果最好。</div>
+  <div class="dfoot">
+    <button class="btn" id="bgDone" type="button">完成</button>
+  </div>
+</dialog>
+
+<input type="file" id="pickPaper" accept=".pdf,.docx,.pptx,application/pdf" hidden>
+<input type="file" id="pickSlides" accept=".pdf,.docx,.pptx,application/pdf" hidden>
+<input type="file" id="pickReplace" accept=".pdf,.docx,.pptx,application/pdf" hidden>
+<input type="file" id="pickBg" accept="image/*" hidden>
+
+<script src="vendor/bg-shader.js"></script>
+<script src="vendor/lib-1-docx.js"></script>
+<script src="vendor/lib-2-zrender.js"></script>
+<script src="vendor/app.js"></script>
+</body>
+</html>

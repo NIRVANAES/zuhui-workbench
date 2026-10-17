@@ -1,0 +1,35 @@
+# ── 构建产物 ───────────────────────────────────────────
+build/
+dist/
+*.spec.bak
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ── 运行时数据（本机 IndexedDB / WebView2 缓存，绝不入库）──
+数据/
+app/数据/
+EBWebView/
+*.log
+_selftest.log
+
+# ── 自检过程中间产物 ───────────────────────────────────
+_shots_*/
+tools/fixtures/
+dist/
+          # 由 make_fixtures.py 现造，不入库
+
+# ── 发布二进制（走 GitHub Releases，不进 git）───────────
+release/*.exe
+release/*.zip
+
+# ── Agent / 编辑器工作目录 ─────────────────────────────
+.slidep/
+_nv2/
+.workbuddy/
+.workbuddy-ai/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
