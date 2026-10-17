@@ -1,5 +1,7 @@
 # ── 构建产物 ───────────────────────────────────────────
-build/
+# build/ 里保留 PyInstaller 配置（README 引用），其余产物不入库
+build/*
+!build/组会工作台.spec
 dist/
 *.spec.bak
 __pycache__/
